@@ -1,0 +1,31 @@
+<%
+# Encoding: UTF-8
+#	Written by: Signo-Net
+#	Email: clientes@signo-net.com 
+#	Web: http://www.signo-net.com 
+
+# This work is licensed under a Creative Commons Attribution 3.0 License.
+# [ http://creativecommons.org/licenses/by/3.0/ ]
+
+# This means you may use it for any purpose, and make any changes you like.
+# All we ask is that you include a link back to our page in your credits.
+
+# Looking forward your comments and suggestions! clientes@signo-net.com
+%>
+<h2><%=l(:label_document_import)%></h2>
+
+<% form_tag({:controller => 'drop_box', :action => 'import', :project_id => @project, :categoria => params[:categoria], :nuevo => params[:nuevo], :size => params[:size]}, :class => "tabular", :multipart => true) do %>
+<%= error_messages_for 'document' %>
+	<div class="box">
+
+		<p title="<%=h l(:formato_nombre_titulo)%>"><label for="document_title"><%=l(:field_title)%> <span class="required">*</span></label>
+		<%= text_field 'document', 'title', :size => 60, :value => params[:nuevo] %></p>
+
+		<p><label for="document_description"><%=l(:field_description)%></label>
+		<%= text_area 'document', 'description', :cols => 60, :rows => 15, :class => 'wiki-edit' %></p>
+
+	</div>
+	<%= wikitoolbar_for 'document_description' %>
+	<%= submit_tag l(:button_import) %>
+	<%= link_to l(:button_cancel), "#", :onclick => 'history.go(-1);return false;' %>
+<% end %>

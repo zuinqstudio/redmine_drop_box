@@ -1,0 +1,48 @@
+<%
+# Encoding: UTF-8
+#	Written by: Signo-Net
+#	Email: clientes@signo-net.com 
+#	Web: http://www.signo-net.com 
+
+# This work is licensed under a Creative Commons Attribution 3.0 License.
+# [ http://creativecommons.org/licenses/by/3.0/ ]
+
+# This means you may use it for any purpose, and make any changes you like.
+# All we ask is that you include a link back to our page in your credits.
+
+# Looking forward your comments and suggestions! clientes@signo-net.com
+%>
+<div class="contextual">
+	<%= link_to_if_authorized l(:label_sincronizar_dropbox), {:controller => 'drop_box', :action => 'synchronize_document', :id => @document}, :class => 'icon icon-reload', :onclick => 'Element.show("ajax-indicator");' %>
+	<%= link_to_if_authorized l(:button_edit), {:controller => 'drop_box', :action => 'edit', :id => @document}, :class => 'icon icon-edit', :accesskey => accesskey(:edit) %>
+	<%= link_to_if_authorized l(:button_delete), {:controller => 'drop_box', :action => 'destroy', :id => @document}, :confirm => l(:text_are_you_sure), :method => :post, :class => 'icon icon-del' %>
+</div>
+
+<h2><%=h @document.title %></h2>
+
+<p><em><%=h @document.category.name %><br />
+<%= format_time @document.created_on %></em></p>
+<div class="wiki">
+	<%= textilizable @document.description %>
+</div>
+
+<h3><%= l(:label_attachment_plural) %></h3>
+<% if @attachments.any? %>
+	<%= render :partial => 'links', :locals => {:attachments => @attachments} %>
+<% end %>
+
+<% if authorize_for('drop_box', 'add_attachment') %>
+  <p><%= link_to l(:label_attachment_new), {}, :onclick => "Element.show('add_attachment_form'); Element.hide(this); Element.scrollTo('add_attachment_form'); return false;", :id => 'attach_files_link' %></p>
+  <% form_tag({ :controller => 'drop_box', :action => 'add_attachment', :id => @document }, :multipart => true, :id => "add_attachment_form", :style => "display:none;") do %>
+  <div class="box">
+  <p><%= render :partial => 'form_attachment' %></p>
+  </div>
+  <%= submit_tag l(:button_add) %>
+  <% end %> 
+<% end %>
+
+<% html_title @document.title -%>
+
+<% content_for :header_tags do %>
+    <%= stylesheet_link_tag 'scm' %>
+<% end %>

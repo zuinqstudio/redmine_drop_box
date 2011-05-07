@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+one:
+  id: 1
+  dropbox_document_id: 1
+  filename: MyString
+  filesize: 1
+  description: MyText
+  author_id: 1
+  created_on: 2011-04-13 19:18:24
+  updated_on: 2011-04-13 19:18:24
+two:
+  id: 2
+  dropbox_document_id: 1
+  filename: MyString
+  filesize: 1
+  description: MyText
+  author_id: 1
+  created_on: 2011-04-13 19:18:24
+  updated_on: 2011-04-13 19:18:24

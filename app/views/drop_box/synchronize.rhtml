@@ -1,0 +1,62 @@
+<%
+# Encoding: UTF-8
+#	Written by: Signo-Net
+#	Email: clientes@signo-net.com 
+#	Web: http://www.signo-net.com 
+
+# This work is licensed under a Creative Commons Attribution 3.0 License.
+# [ http://creativecommons.org/licenses/by/3.0/ ]
+
+# This means you may use it for any purpose, and make any changes you like.
+# All we ask is that you include a link back to our page in your credits.
+
+# Looking forward your comments and suggestions! clientes@signo-net.com
+%>
+<h2><%=l(:label_sincronizacion_dropbox)%></h2>
+
+<% @elementos.keys.sort.each do |categoria| %>
+	<% if !@elementos[categoria]["E"].empty? || !@elementos[categoria]["N"].empty? %>
+	    <h3><%= categoria %></h3>
+
+		<% unless @elementos[categoria]["E"].empty? %>
+			<h4><%=l(:label_documentos_eliminados_dropbox)%></h4>
+			<ul>
+			<% @elementos[categoria]["E"].each do |documento| %>
+			   <li>
+					<%= link_to h(documento.title), :controller => 'drop_box', :action => 'show', :id => documento, :project_id => @project %>
+   				    <%= link_to_if_authorized image_tag('delete.png'), {:controller => 'drop_box', :action => 'destroy', :id => documento},
+														 :confirm => l(:text_are_you_sure),
+														 :method => :post,
+														 :class => 'delete',
+														 :title => l(:button_delete) %>
+				</li>
+			<% end %>
+			</ul>
+		<% end %>
+		
+		<% unless @elementos[categoria]["N"].empty? %>
+			<h4><%=l(:label_documentos_anyadidos_dropbox)%></h4>
+			<ul>
+			<% @elementos[categoria]["N"].each do |nuevo| %>
+			    <li>
+					<%= nuevo["P"] %>
+					<% if nuevo["S"] > 0 %>
+						<span class="size">(<%= number_to_human_size nuevo["S"] %>)</span>
+					<% end %>
+					
+   				    <%= link_to_if_authorized image_tag('add.png'), {:controller => 'drop_box', :action => 'import', :nuevo => nuevo["P"], :size => nuevo["S"], :categoria => categoria, :project_id => @project},
+														 :confirm => l(:text_are_you_sure),
+														 :method => :get,
+														 :class => 'add',
+														 :title => l(:button_add) %>
+				</li>
+			<% end %>
+			</ul>
+		<% end %>
+	<% end %>
+<% end %>
+
+<% content_for :sidebar do %>
+    <h3><%= l(:label_ayuda_sincronizar, '') %></h3>
+    <p><%= l(:label_info_sincronizacion, '') %></p>
+<% end %>
