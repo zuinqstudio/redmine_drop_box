@@ -28,7 +28,7 @@ en:
   label_filesize_reached: "You have exceeded the size limit for sending files to Dropbox ({{value}} Mb). Please add this file directly from Dropbox and sync with Dropbox to add it to the project"
   label_por: "by"
   asunto_documento_add: "Document added by {{author}} to {{proyecto}} project."
-  mensaje_documento_add: "User {{autor}} added {{documento}} to {{proyecto}} project"
+  mensaje_documento_add: "User {{author}} added {{documento}} to {{proyecto}} project"
   documento_repetido: "There is already a document with the selected name"
   documento_sincronizado: "Document successfully synchronized ({{anadidos}} files added / s, {{eliminados}} file / s removed)"
 
