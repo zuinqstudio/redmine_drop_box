@@ -65,61 +65,6 @@ class DropboxAttachment < ActiveRecord::Base
     end
   end
   
-  def before_update
-	logger.debug("****** Actualizando documento")
-	self.updated_on = Time.now
-    if not @temp_file.blank?
-		logger.debug("****** Se ha enviado un nuevo fichero, borramos el anterior y subimos el nuevo")
-		conectado = dropbox_connect()
-		if conectado
-			logger.debug("****** Eliminando fichero: " + self.ruta)
-			eliminado_archivo = @client.file_delete(@conf['root'], self.ruta)
-			if eliminado_archivo
-				logger.debug("****** Eliminado fichero!!!")
-				#Comprobamos que no exista ya un fichero con ese nombre en esa carpeta
-				path_archivo = DropboxDocument.ruta_categoria_documento(self.documento.project, self.documento.category, self.documento);
-				nombre_archivo = DropboxDocument.get_nombre_si_repetido(@temp_file.original_filename, path_archivo, self.documento.project, self.category_id)
-				logger.debug("****** Enviando nuevo fichero: " + path_archivo + nombre_archivo)
-				enviado_archivo = @client.put_file(@conf['root'], path_archivo, nombre_archivo, @temp_file)
-				if enviado_archivo
-					logger.debug("****** Enviado fichero!!!")
-					#Actualizamos la ruta del fichero
-					self.ruta = path_archivo + nombre_archivo;
-				else
-					raise DropboxException.new(), "No se ha podido enviar el nuevo archivo a DropBox" + self.ruta
-				end
-				
-			else
-				raise DropboxException.new(), "No se ha podido eliminar el archivo de DropBox" + self.ruta
-			end
-		end
-	else
-		logger.debug("****** No se ha actualizado el fichero")
-		#Miramos si ha cambiado la categoria para mover el archivo
-		documento_guardado =  DropboxDocument.find(self.id)
-		categoria_anterior = documento_guardado.category_id
-		if self.category_id != categoria_anterior
-			logger.debug("****** Hemos cambiado la categoria del archivo ")
-			path_archivo = DropboxDocument.ruta_categoria_documento(self.documento.project, self.documento.category, self.documento);
-			nombre_archivo = DropboxDocument.get_nombre_si_repetido(self.nombre_archivo, path_archivo, self.documento.project, self.category_id)
-			logger.debug("****** Moviendo fichero de : " + self.ruta + " => " + path_archivo + nombre_archivo)
-			conectado = dropbox_connect()
-			if conectado
-				movido_archivo = @client.file_move(@conf['root'], self.ruta , path_archivo + nombre_archivo)
-				if movido_archivo
-					logger.debug("****** Enviado fichero!!!")
-					#Actualizamos la ruta del fichero
-					self.ruta = path_archivo + nombre_archivo;
-				end
-			else
-				raise DropboxException.new(), "No se ha podido eliminar el archivo de DropBox" + self.ruta
-			end
-		else
-			logger.debug("****** No hemos cambiado la categoria del archivo ")
-		end
-	end
-  end
-  
   def before_destroy
 	logger.debug("****** Eliminando documento de DropBox: " + self.ruta)
     if self.ruta != "" && self.path_archivo && self.nombre_archivo
@@ -201,6 +146,25 @@ class DropboxAttachment < ActiveRecord::Base
 	end
   end
   
+  def update_path(new_path)
+    documentName = substring_after_last(self.ruta, "/")
+    if (new_path.end_with?"/")
+      self.ruta = new_path + documentName
+    else
+      self.ruta = new_path + "/" + documentName
+    end
+    self.save
+  end
+   
+  def substring_after_last(cadena, separador) 
+    lastIndex = cadena.rindex(separador)
+    if (lastIndex != nil)
+      return cadena[lastIndex + 1, cadena.length - 1]
+    else
+      return ""
+    end
+  end
+ 
   #Static methods
   def self.validar_nombre_fichero(fichero)
     return validar_nombre_cadena(fichero.original_filename)    
@@ -246,7 +210,6 @@ class DropboxAttachment < ActiveRecord::Base
 			#Comprobamos el tamaño
 			if DropboxAttachment.check_size_reached(file.size)
 				warnings << l(:label_filesize_reached, DropboxAttachment.get_max_filesize_mb.to_s)
-				redirect_to :action => 'new', :project_id => project
 			else
 			    attachment = DropboxAttachment.new()
 				attachment.author = User.current
@@ -259,8 +222,8 @@ class DropboxAttachment < ActiveRecord::Base
 
 				begin
 					if attachment.save
-					    subject = l(:asunto_documento_add, :author => User.current, :proyecto => project.name)
-					    mensaje = l(:mensaje_documento_add, :author => User.current, :documento => nombre_archivo, :proyecto => project.name)
+					    subject = l(:asunto_documento_add, :autor => User.current, :proyecto => project.name)
+					    mensaje = l(:mensaje_documento_add, :autor => User.current, :documento => nombre_archivo, :proyecto => project.name)
 						DropBoxMailer::deliver_send_new_document(project.recipients, subject, mensaje) if Setting.notified_events.include?('document_added')
 			            attached << attachment
 					else

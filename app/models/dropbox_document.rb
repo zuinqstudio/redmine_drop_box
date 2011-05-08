@@ -64,6 +64,11 @@ class DropboxDocument < ActiveRecord::Base
 				logger.debug("****** Movido directorio!!!")
 				#Actualizamos la ruta del fichero
 				self.ruta = path_archivo;
+        
+		        # Update attachments paths
+		        self.attachments.each{|attachment|
+		          attachment.update_path(self.ruta)
+		        }
 			end
 		else
 			raise DropboxException.new(), "No se ha podido mover el archivo de DropBox" + self.ruta

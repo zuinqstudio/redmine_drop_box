@@ -27,8 +27,8 @@ es:
   button_import: "Importar"
   label_filesize_reached: "Ha superado el límite de tamaño de archivos para enviar a Dropbox ({{value}} Mb). Por favor, añada este fichero directamente desde Dropbox y sincronize con Dropbox para añadirlo al proyecto"
   label_por: "por"
-  asunto_documento_add: "Documento añadido por {{author}} al proyecto {{proyecto}}."
-  mensaje_documento_add: "El usuario {{author}} ha añadido el documento {{documento}} al proyecto {{proyecto}}"
+  asunto_documento_add: "Documento añadido por {{autor}} al proyecto {{proyecto}}."
+  mensaje_documento_add: "El usuario {{autor}} ha añadido el documento {{documento}} al proyecto {{proyecto}}"
   documento_repetido: "Ya existe un documento con el nombre seleccionado"
   documento_sincronizado: "Documento sincronizado correctamente ({{anadidos}} ficheros añadido/s, {{eliminados}} fichero/s eliminados)"
 

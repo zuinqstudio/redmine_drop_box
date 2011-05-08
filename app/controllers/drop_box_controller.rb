@@ -69,8 +69,8 @@ class DropBoxController < ApplicationController
 			flash[:warning]=warning
 		  }
 		  
-		  subject = l(:asunto_documento_add, :author => User.current, :proyecto => @project.name)
-		  mensaje = l(:mensaje_documento_add, :author => User.current, :documento => @document.title, :proyecto => @project.name)
+		  subject = l(:asunto_documento_add, :autor => User.current, :proyecto => @project.name)
+		  mensaje = l(:mensaje_documento_add, :autor => User.current, :documento => @document.title, :proyecto => @project.name)
 		  DropBoxMailer::deliver_send_new_document(@project.recipients, subject, mensaje) if Setting.notified_events.include?('document_added')
 	      
 		  flash[:notice] = l(:notice_successful_create)
