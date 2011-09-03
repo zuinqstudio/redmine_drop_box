@@ -214,7 +214,7 @@ class DropboxClient
 
     def build_url(host, port, url, params=nil)
         port = port == 80 ? nil : port
-        versioned_url = "/#{API_VERSION}#{url}"
+        versioned_url = URI.escape("/#{API_VERSION}#{url}")
 
         target = URI::Generic.new("http", nil, host, port, nil, versioned_url, nil, nil, nil)
 
