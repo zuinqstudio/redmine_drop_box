@@ -1,7 +1,7 @@
 # Encoding: UTF-8
-#	Written by: Signo-Net
-#	Email: clientes@signo-net.com 
-#	Web: http://www.signo-net.com 
+#	Written by: Zuinq Studio
+#	Email: info@zuinqstudio.com 
+#	Web: http://www.zuinqstudio.com 
 
 # This work is licensed under a Creative Commons Attribution 3.0 License.
 # [ http://creativecommons.org/licenses/by/3.0/ ]
@@ -14,8 +14,7 @@
 require 'rubygems'
 require 'shoulda'
 require 'pp'
-require_dependency 'dropbox/lib/dropbox'
-require_dependency 'dropbox/test/util'
+require_dependency 'dropbox/lib/dropbox_sdk'
 
 
 class DropboxException < RuntimeError
@@ -48,18 +47,19 @@ class DropboxAttachment < ActiveRecord::Base
 		logger.debug("****** Guardando documento en: " + self.ruta)
 		conectado = dropbox_connect()
 		if conectado
-			creada_carpeta = @client.file_create_folder(@conf['root'], self.path_archivo)
-			if creada_carpeta
+			begin 
+				@client.file_create_folder(self.path_archivo)
 				logger.debug("****** Creada la carpeta: " + self.path_archivo)
-				logger.debug("****** Enviando fichero...")
-				enviado_archivo = @client.put_file(@conf['root'], self.path_archivo, self.nombre_archivo, @temp_file)
-				if enviado_archivo
-					logger.debug("****** Enviado fichero!!!")
-				else
-					raise DropboxException.new(), "No se ha podido enviar el archivo a DropBox" + self.ruta
-				end
+			rescue DropboxError
+				logger.debug("****** La carpeta ya existe: " + self.path_archivo)
+			end
+
+			logger.debug("****** Enviando fichero...")
+			enviado_archivo = @client.put_file(self.ruta, @temp_file)
+			if enviado_archivo
+				logger.debug("****** Enviado fichero!!!")
 			else
-				raise DropboxException.new(), "No se ha podido crear la carpeta en DropBox" + self.path_archivo
+				raise DropboxException.new(), "No se ha podido enviar el archivo a DropBox" + self.ruta
 			end
 		end
     end
@@ -71,11 +71,11 @@ class DropboxAttachment < ActiveRecord::Base
 		conectado = dropbox_connect()
 		if conectado
 			logger.debug("****** Eliminando fichero...")
-			eliminado_archivo = @client.file_delete(@conf['root'], self.ruta)
-			if eliminado_archivo
+			begin
+				@client.file_delete(self.ruta)
 				logger.debug("****** Eliminado fichero!!!")
-			else
-				raise DropboxException.new(), "No se ha podido eliminar el archivo de DropBox" + self.ruta
+			rescue DropboxError
+				#raise DropboxException.new(), "No se ha podido eliminar el archivo de DropBox" + self.ruta
 			end
 		end
     end
@@ -111,7 +111,7 @@ class DropboxAttachment < ActiveRecord::Base
 	error = false
 	if conectado
 		logger.debug("****** Recuperando fichero de DropBox: " + self.ruta)
-		fichero = @client.get_file(@conf['root'], self.ruta)
+		fichero = @client.get_file(self.ruta)
 		if fichero
 			filename = File.basename(self.ruta)
 			logger.debug("****** Fichero recuperado: " + filename)
@@ -132,11 +132,15 @@ class DropboxAttachment < ActiveRecord::Base
 	conectado = dropbox_connect()
 	error = false
 	if conectado
-		movido_archivo = @client.file_move(@conf['root'], from , to)
-		if movido_archivo
-			logger.debug("****** Movido fichero!!!")
-			#Actualizamos la ruta del fichero
-			self.ruta = to;
+		begin
+			movido_archivo = @client.file_move(from , to)
+			if movido_archivo
+				logger.debug("****** Movido fichero!!!")
+				#Actualizamos la ruta del fichero
+				self.ruta = to;
+			end
+		rescue DropboxError
+			error = true
 		end
 	else
 		error = true
@@ -296,31 +300,18 @@ class DropboxAttachment < ActiveRecord::Base
 		return true
 	else
 		logger.debug("****** Conectando a DropBox... ")
-		dropbox_config()
-		if (@conf && @conf["testing_user"] != "" && @conf["testing_password"] != "")
-			begin
-				logger.debug("****** Recuperada configuración. Usuario: " + @conf["testing_user"] + " Passw: " + @conf["testing_password"])
-				@auth = Authenticator.new(@conf) unless defined?(AUTH)
-				login_and_authorize(@auth.get_request_token, @conf)
-				@access_token = @auth.get_access_token
-				@client = DropboxClient.new(@conf['server'], @conf['content_server'], @conf['port'], @auth)
-				logger.debug("****** Conectado a DropBox ")
-			rescue OAuth::Unauthorized
-				raise DropboxException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
-			end
-			return true
-		else
-			logger.debug("****** No se ha podido conectar a DropBox. No está definido usuario y password ")
-			raise DropboxException.new(), "No se ha podido conectar a DropBox. No está definido usuario y password"
-			return false
+
+        # Check if user has no dropbox session...re-direct them to authorize
+        return redirect_to(:action => 'authorize') unless Setting.plugin_redmine_drop_box[:dropbox_session]
+
+		begin
+	        @session = DropboxSession.deserialize(Setting.plugin_redmine_drop_box[:dropbox_session])
+	        @client = DropboxClient.new(@session, ACCESS_TYPE) #raise an exception if session not authorized
+	        @info = @client.account_info # look up account information
+		rescue OAuth::Unauthorized
+			raise DropboxException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
 		end
 	end
-  end
-  
-  def dropbox_config
-	@conf = Authenticator.load_config(File.dirname(__FILE__) + "/../../lib/dropbox/config/testing.json")
-	@conf["testing_user"] = Setting.plugin_redmine_drop_box["USERNAME"]
-	@conf["testing_password"] = Setting.plugin_redmine_drop_box["PASSWORD"]
   end
 
   

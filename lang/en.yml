@@ -31,4 +31,5 @@ en:
   mensaje_documento_add: "User {{autor}} added {{documento}} to {{proyecto}} project"
   documento_repetido: "There is already a document with the selected name"
   documento_sincronizado: "Document successfully synchronized ({{anadidos}} files added / s, {{eliminados}} file / s removed)"
-
+  aplicacion_autorizada_correctamente: "Redmine has been successfully authorized. You can now send your documents to DropBox!"
+  autorizar_aplicacion_dropbox: "Click here to authorize Redmine by your DropBox account"

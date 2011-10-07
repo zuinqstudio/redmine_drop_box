@@ -1,7 +1,7 @@
 # Encoding: UTF-8
-#	Written by: Signo-Net
-#	Email: clientes@signo-net.com 
-#	Web: http://www.signo-net.com 
+#	Written by: Zuinq Studio
+#	Email: info@zuinqstudio.com 
+#	Web: http://www.zuinqstudio.com 
 
 # This work is licensed under a Creative Commons Attribution 3.0 License.
 # [ http://creativecommons.org/licenses/by/3.0/ ]
@@ -17,19 +17,19 @@ require 'json'
 require 'uri'
 require 'net/http/post/multipart'
 
+
 Redmine::Plugin.register :redmine_drop_box do
 	name 'Redmine Dropbox Plugin'
-	author 'Signo-Net'
+	author 'Zuinq Studio'
 	description 'Storage proyect files on your Dropbox account'
 	version '0.0.1'
-	url 'http://www.signo-net.com/downloads/'
-	author_url 'http://www.signo-net.com'
+	url 'http://www.zuinqstudio.com/labs/'
+	author_url 'http://www.zuinqstudio.com'
 
 	menu :project_menu, :drop_box, { :controller => 'drop_box', :action => 'index' }, :caption => 'Dropbox', :after => :documents, :param => :project_id
 
 	settings :default => {
-		'USERNAME' => '',
-		'PASSWORD' => '',
+		'DROPBOX_SESSION' => nil,
 		'PATH_BASE_DOCUMENTOS' => 'REDMINE'
 	}, :partial => 'settings/dropbox_settings'
 

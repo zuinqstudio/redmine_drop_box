@@ -11,7 +11,7 @@ es:
   field_description: "Descripción"
   label_titulo_configuracion: "Información"
   label_info_configuracion: "Debe indicar el usuario/password de su cuenta de Dropbox. Además debe indicar la ruta base donde se almacenarán los ficheros en su cuenta. La ruta no puede contener caracteres especiales"
-  error_conexion_dropbox: "Error de conexión con Dropbox. Compruebe en la configuración del plugin que ha introducido correctamente su usuario/password de la cuenta Dropbox."
+  error_conexion_dropbox: "Error de conexión con Dropbox. Compruebe en la configuración del plugin que ha autorizado correctamente la aplicación con su cuenta Dropbox."
   warning_falta_archivo: "Debe seleccionar un archivo"
   warning_error_nombre_archivo: "El nombre del archivo es incorrecto. El nombre no puede contener caracteres especiales."
   error_fichero_no_enco_dropbox: "No se ha encontrado el fichero en su cuenta de Dropbox. Es posible que lo haya eliminado de su cuenta"
@@ -31,5 +31,6 @@ es:
   mensaje_documento_add: "El usuario {{autor}} ha añadido el documento {{documento}} al proyecto {{proyecto}}"
   documento_repetido: "Ya existe un documento con el nombre seleccionado"
   documento_sincronizado: "Documento sincronizado correctamente ({{anadidos}} ficheros añadido/s, {{eliminados}} fichero/s eliminados)"
-
+  aplicacion_autorizada_correctamente: "La aplicación ha sido autorizada correctamente. Ya puede utilizar su plugin de Dropbox!"
+  autorizar_aplicacion_dropbox: "Haga click aquí para autorizar la aplicación en su cuenta de Dropbox"
   

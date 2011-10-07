@@ -1,7 +1,7 @@
 # Encoding: UTF-8
-#	Written by: Signo-Net
-#	Email: clientes@signo-net.com 
-#	Web: http://www.signo-net.com 
+#	Written by: Zuinq Studio
+#	Email: info@zuinqstudio.com 
+#	Web: http://www.zuinqstudio.com 
 
 # This work is licensed under a Creative Commons Attribution 3.0 License.
 # [ http://creativecommons.org/licenses/by/3.0/ ]
@@ -13,6 +13,7 @@
 
 ActionController::Routing::Routes.draw do |map|
    map.connect 'projects/:project_id/dropbox/:action', :controller => 'drop_box'
+   map.connect 'dropbox/:action', :controller => 'drop_box'
 end
 
 

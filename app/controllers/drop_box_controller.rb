@@ -1,7 +1,7 @@
 # Encoding: UTF-8
-#	Written by: Signo-Net
-#	Email: clientes@signo-net.com 
-#	Web: http://www.signo-net.com 
+#	Written by: Zuinq Studio
+#	Email: info@zuinqstudio.com 
+#	Web: http://www.zuinqstudio.com 
 
 # This work is licensed under a Creative Commons Attribution 3.0 License.
 # [ http://creativecommons.org/licenses/by/3.0/ ]
@@ -108,13 +108,14 @@ class DropBoxController < ApplicationController
 	begin
 		if @document.destroy
 			flash[:notice] = l(:notice_successful_delete)
-			redirect_to :action => 'index', :project_id => @project
 		end
 	rescue Errno::ETIMEDOUT
 		flash[:warning]=l(:error_conexion_dropbox)
 	rescue DropboxException
 		flash[:warning]=l(:error_conexion_dropbox)
 	end
+	
+	redirect_to :action => 'index', :project_id => @project
   end
   
   def download_attachment
@@ -190,7 +191,8 @@ class DropBoxController < ApplicationController
 		rescue Errno::ETIMEDOUT
 			flash[:warning]=l(:error_conexion_dropbox)
 		rescue DropboxException
-			flash[:warning]=l(:error_conexion_dropbox)
+			#No hacemos nada,  no ha encontrado alguna carpeta de categoria
+			#flash[:warning]=l(:error_conexion_dropbox)
 		end
 	}
 
@@ -294,15 +296,46 @@ class DropBoxController < ApplicationController
 		}
 
 		flash[:notice]=l(:documento_sincronizado, :anadidos => anadidos, :eliminados => eliminados)
-		redirect_to  :action => 'show', :id => @document
 
 	rescue Errno::ETIMEDOUT
 		flash[:warning]=l(:error_conexion_dropbox)
 	rescue DropboxException
 		flash[:warning]=l(:error_conexion_dropbox)
 	end
+
+	redirect_to  :action => 'show', :id => @document
   end
- 
+
+  def authorize
+	settings = Setting.find_by_name('plugin_redmine_drop_box')
+
+	if not params[:oauth_token] then
+		dbsession = DropboxSession.new(APP_KEY, APP_SECRET)
+		
+		#Lo guardamos en los settings
+		tmp = settings.value
+		tmp[:dropbox_session] = dbsession.serialize
+		settings.value = tmp
+		settings.save
+
+		#pass to get_authorize_url a callback url that will return the user here
+		redirect_to dbsession.get_authorize_url url_for(:action => 'authorize')
+	else
+		# the user has returned from Dropbox
+		dbsession = DropboxSession.deserialize(settings.value[:dropbox_session])
+		dbsession.get_access_token  #we've been authorized, so now request an access_token
+		
+		#Lo guardamos en los settings
+		tmp = settings.value
+		tmp[:dropbox_session] = dbsession.serialize
+		settings.value = tmp
+		settings.save
+
+		flash[:warning]=l(:aplicacion_autorizada_correctamente)
+		redirect_to "/settings/plugin/redmine_drop_box"
+	end
+  end
+
   private
      
   def find_project

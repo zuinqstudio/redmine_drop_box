@@ -31,5 +31,6 @@ es:
   mensaje_documento_add: "El usuario {{autor}} ha añadido el documento {{documento}} al proyecto {{proyecto}}"
   documento_repetido: "Ya existe un documento con el nombre seleccionado"
   documento_sincronizado: "Documento sincronizado correctamente ({{anadidos}} ficheros añadido/s, {{eliminados}} fichero/s eliminados)"
-
+  aplicacion_autorizada_correctamente: "La aplicación ha sido autorizada correctamente. Ya puede utilizar su plugin de Dropbox!"
+  autorizar_aplicacion_dropbox: "Haga click aquí para autorizar la aplicación en su cuenta de Dropbox"
   
