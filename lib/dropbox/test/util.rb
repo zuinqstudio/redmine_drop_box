@@ -3,7 +3,7 @@ require 'mechanize'
 
 
 def login_and_authorize(authorize_url, config)
-    a = WWW::Mechanize.new
+    a = Mechanize.new
     a.get(authorize_url) do |page|
         login_form = page.form_with(:action => '/login')
                 
