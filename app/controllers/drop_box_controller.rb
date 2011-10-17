@@ -308,8 +308,12 @@ class DropBoxController < ApplicationController
 
   def authorize
 	settings = Setting.find_by_name('plugin_redmine_drop_box')
-
-	if not params[:oauth_token] then
+	
+	if settings==nil then
+		flash[:warning]=l(:aviso_antes_autorizar_guardar)
+		redirect_to "/settings/plugin/redmine_drop_box"
+	
+	elsif not params[:oauth_token] then
 		dbsession = DropboxSession.new(APP_KEY, APP_SECRET)
 		
 		#Lo guardamos en los settings

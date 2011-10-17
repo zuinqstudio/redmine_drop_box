@@ -33,3 +33,4 @@ en:
   documento_sincronizado: "Document successfully synchronized ({{anadidos}} files added / s, {{eliminados}} file / s removed)"
   aplicacion_autorizada_correctamente: "Redmine has been successfully authorized. You can now send your documents to DropBox!"
   autorizar_aplicacion_dropbox: "Click here to authorize Redmine by your DropBox account"
+  aviso_antes_autorizar_guardar: "Before authorizing the application, save the plugin configuration"
