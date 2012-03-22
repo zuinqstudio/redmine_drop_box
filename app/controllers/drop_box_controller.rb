@@ -48,6 +48,8 @@ class DropBoxController < ApplicationController
     end
     @document = @project.documents.build
     render :layout => false if request.xhr?
+  rescue DropboxAuthorizeException
+	flash[:warning]=l(:error_conexion_dropbox)
   end
   
   def new
@@ -77,6 +79,8 @@ class DropBoxController < ApplicationController
 	      redirect_to :action => 'index', :project_id => @project
 	    end
    end
+  rescue DropboxAuthorizeException
+	flash[:warning]=l(:error_conexion_dropbox)
   end
   
   def show
@@ -89,6 +93,8 @@ class DropBoxController < ApplicationController
 
     #Mailer.deliver_attachments_added(attachments[:files]) if attachments.present? && attachments[:files].present? && Setting.notified_events.include?('document_added')
     redirect_to :action => 'show', :id => @document
+  rescue DropboxAuthorizeException
+	flash[:warning]=l(:error_conexion_dropbox)
   end
   
   def edit
@@ -102,6 +108,8 @@ class DropBoxController < ApplicationController
 	      redirect_to :action => 'show', :id => @document
 	  end
     end
+  rescue DropboxAuthorizeException
+	flash[:warning]=l(:error_conexion_dropbox)
   end
 
   def destroy
@@ -112,6 +120,8 @@ class DropBoxController < ApplicationController
 	rescue Errno::ETIMEDOUT
 		flash[:warning]=l(:error_conexion_dropbox)
 	rescue DropboxException
+		flash[:warning]=l(:error_conexion_dropbox)
+	rescue DropboxAuthorizeException
 		flash[:warning]=l(:error_conexion_dropbox)
 	end
 	
@@ -142,6 +152,8 @@ class DropBoxController < ApplicationController
 	rescue Errno::ETIMEDOUT
 		flash[:warning]=l(:error_conexion_dropbox)
 	rescue DropboxException
+		flash[:warning]=l(:error_conexion_dropbox)
+	rescue DropboxAuthorizeException
 		flash[:warning]=l(:error_conexion_dropbox)
 	end
   end
@@ -193,6 +205,8 @@ class DropBoxController < ApplicationController
 		rescue DropboxException
 			#No hacemos nada,  no ha encontrado alguna carpeta de categoria
 			#flash[:warning]=l(:error_conexion_dropbox)
+		rescue DropboxAuthorizeException
+			flash[:warning]=l(:error_conexion_dropbox)
 		end
 	}
 
@@ -241,6 +255,8 @@ class DropBoxController < ApplicationController
 			rescue Errno::ETIMEDOUT
 				flash[:warning]=l(:error_conexion_dropbox)
 			rescue DropboxException
+				flash[:warning]=l(:error_conexion_dropbox)
+			rescue DropboxAuthorizeException
 				flash[:warning]=l(:error_conexion_dropbox)
 			end
 		  #Muestro el aviso
@@ -300,6 +316,8 @@ class DropBoxController < ApplicationController
 	rescue Errno::ETIMEDOUT
 		flash[:warning]=l(:error_conexion_dropbox)
 	rescue DropboxException
+		flash[:warning]=l(:error_conexion_dropbox)
+	rescue DropboxAuthorizeException
 		flash[:warning]=l(:error_conexion_dropbox)
 	end
 

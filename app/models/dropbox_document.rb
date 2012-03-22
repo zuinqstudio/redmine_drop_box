@@ -22,6 +22,11 @@ class DropboxException < RuntimeError
   end
 end
 
+class DropboxAuthorizeException < RuntimeError
+  def initialize
+  end
+end
+
 class DropboxDocument < ActiveRecord::Base
   unloadable
   
@@ -75,6 +80,8 @@ class DropboxDocument < ActiveRecord::Base
 	else
 		logger.debug("****** No hemos cambiado la categoria del archivo ")
 	end
+  rescue DropboxAuthorizeException 
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
   
   def before_destroy
@@ -99,6 +106,8 @@ class DropboxDocument < ActiveRecord::Base
 			#No hacemos nada porque es posible que la carpeta ya no existiera en Dropbox
 		end
 	end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
  
   def initialize_unsaved_attachments
@@ -131,6 +140,8 @@ class DropboxDocument < ActiveRecord::Base
 	if error
 		raise DropboxException.new(), "No se ha podido recuperar los metadatos del directorio: " + path 
 	end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
   
   def dropbox_move(from, to)
@@ -154,6 +165,8 @@ class DropboxDocument < ActiveRecord::Base
 	if error
 		raise DropboxException.new(), "No se ha podido recuperar mover el archivo: " + from 
 	end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
   
   def self.ruta_categoria(proyecto, category)
@@ -183,14 +196,19 @@ class DropboxDocument < ActiveRecord::Base
 		logger.debug("****** Conectando a DropBox... ")
 
         # Check if user has no dropbox session...re-direct them to authorize
-        return redirect_to(:action => 'authorize') unless Setting.plugin_redmine_drop_box[:dropbox_session]
+        raise DropboxAuthorizeException.new() unless Setting.plugin_redmine_drop_box[:dropbox_session] 
 
 		begin
 	        @session = DropboxSession.deserialize(Setting.plugin_redmine_drop_box[:dropbox_session])
 	        @client = DropboxClient.new(@session, ACCESS_TYPE) #raise an exception if session not authorized
 	        @info = @client.account_info # look up account information
+			
+		rescue DropboxAuthError
+			raise DropboxAuthorizeException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
+		rescue Net::HTTPUnauthorized
+			raise DropboxAuthorizeException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
 		rescue OAuth::Unauthorized
-			raise DropboxException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
+			raise DropboxAuthorizeException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
 		end
 	end
   end

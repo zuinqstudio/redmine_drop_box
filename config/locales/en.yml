@@ -11,7 +11,7 @@ en:
   field_description: "Description"
   label_titulo_configuracion: "Information"
   label_info_configuracion: "You should write user / password of your Dropbox account. You must also specify the base path where files are stored in your account. The path can not contain special characters"
-  error_conexion_dropbox: "Dropbox connection error. Check user / password Dropbox account on plugin page configuration."
+  error_conexion_dropbox: "Dropbox connection error. Check authorization of your Dropbox account on plugin page configuration."
   warning_falta_archivo: "You must select a file"
   warning_error_nombre_archivo: "Filename incorrect. The name can not contain special characters."
   error_fichero_no_enco_dropbox: "File not found in your Dropbox account. It is possible that it was deleted from your account"

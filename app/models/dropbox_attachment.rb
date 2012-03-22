@@ -22,6 +22,11 @@ class DropboxException < RuntimeError
   end
 end
 
+class DropboxAuthorizeException < RuntimeError
+  def initialize
+  end
+end
+
 class DropboxAttachment < ActiveRecord::Base
   unloadable
   
@@ -63,6 +68,8 @@ class DropboxAttachment < ActiveRecord::Base
 			end
 		end
     end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
   
   def before_destroy
@@ -79,6 +86,8 @@ class DropboxAttachment < ActiveRecord::Base
 			end
 		end
     end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
   
   def file=(incoming_file)
@@ -92,6 +101,8 @@ class DropboxAttachment < ActiveRecord::Base
 		self.filesize = @temp_file.size
       end
     end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
 	
   def file
@@ -125,6 +136,8 @@ class DropboxAttachment < ActiveRecord::Base
 	if error
 		raise DropboxException.new(), "No se ha podido recuperar el fichero"
 	end
+  rescue DropboxAuthorizeException
+	raise DropboxAuthorizeException.new(), "No se encuentra autorizada su cuenta de Dropbox. Acceda a la configuración del plugin."
   end
   
   def dropbox_move(from, to)
@@ -302,14 +315,19 @@ class DropboxAttachment < ActiveRecord::Base
 		logger.debug("****** Conectando a DropBox... ")
 
         # Check if user has no dropbox session...re-direct them to authorize
-        return redirect_to(:action => 'authorize') unless Setting.plugin_redmine_drop_box[:dropbox_session]
+        raise DropboxAuthorizeException.new() unless Setting.plugin_redmine_drop_box[:dropbox_session]
 
 		begin
 	        @session = DropboxSession.deserialize(Setting.plugin_redmine_drop_box[:dropbox_session])
 	        @client = DropboxClient.new(@session, ACCESS_TYPE) #raise an exception if session not authorized
 	        @info = @client.account_info # look up account information
+			
+		rescue DropboxAuthError
+			raise DropboxAuthorizeException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
+		rescue Net::HTTPUnauthorized
+			raise DropboxAuthorizeException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
 		rescue OAuth::Unauthorized
-			raise DropboxException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
+			raise DropboxAuthorizeException.new(), "No se ha podido conectar a DropBox. Usuario/password incorrecto/s"
 		end
 	end
   end
