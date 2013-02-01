@@ -22,6 +22,16 @@ class DropBoxMailer < ActionMailer::Base
    end
 end  
 
+class DropboxException < RuntimeError
+  def initialize
+  end
+end
+
+class DropboxAuthorizeException < RuntimeError
+  def initialize
+  end
+end
+
 class DropBoxController < ApplicationController
   default_search_scope :documents
   before_filter :find_project, :only => [:index, :new, :synchronize, :import]
