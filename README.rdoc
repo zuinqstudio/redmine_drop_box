@@ -2,6 +2,10 @@
 
 This plugin allows to storage proyect files on your Dropbox account.
 
+=== Requirements
+
+- Dropbox plugin only works with Redmine 1.x
+
 === Installing the plugin
 
 Getting started with the Dropbox Plugin:
@@ -14,12 +18,11 @@ Getting started with the Dropbox Plugin:
 4. Install json from rubygems
 5. Install mechanize from rubygems
 6. Install shoulda from rubygems
-7. Start developing your Dropbox Plugin!
 
 - Unzip the plugin in your <tt>redmine/vendor/plugins/</tt> folder.
-- Migrate database with rake <tt>db:migrate_plugins</tt>
+- Migrate database with rake <tt>db:migrate_plugin NAME=redmine-dropbox</tt>
 - Once the plugin is installed, you must open the plugin configuration in Admin->Plugins_Configuration, 
-  and enter your DropBox account user/pass and Dropbox base Redmine documents path 
+  and enter your Dropbox base Redmine documents path and authorize Dropbox 
 - Enjoy!
 
 === Uninstalling the plugin
